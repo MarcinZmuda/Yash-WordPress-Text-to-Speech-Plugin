@@ -304,8 +304,8 @@ class Yash {
     /* ------------------------------------------------------------------ */
 
     public function admin_menu() {
-        add_options_page( 'Article Reader Pro', 'Article Reader', 'manage_options', 'article-reader', [ $this, 'settings_page' ] );
-        add_submenu_page( 'options-general.php', 'AR Statystyki', null, 'manage_options', 'article-reader-stats', [ $this, 'stats_page' ] );
+        add_options_page( 'Yash', 'Yash', 'manage_options', 'article-reader', [ $this, 'settings_page' ] );
+        add_submenu_page( 'options-general.php', 'Yash — Statistics', null, 'manage_options', 'article-reader-stats', [ $this, 'stats_page' ] );
     }
 
     public function register_settings() {
@@ -347,7 +347,7 @@ class Yash {
         }
         ?>
         <div class="wrap">
-        <h1>🔊 Article Reader Pro</h1>
+        <h1>🔊 Yash — Settings</h1>
         <?php if ( empty($o['api_key']) ) : ?>
         <div class="notice notice-warning"><p><strong>Wklej klucz API Google Cloud</strong> — <a href="https://console.cloud.google.com/apis/credentials" target="_blank">Utwórz klucz →</a></p></div>
         <?php endif; ?>
@@ -387,7 +387,7 @@ class Yash {
         $top   = AR_Stats::get_top_posts($days);
         $daily = AR_Stats::get_daily($days);
         ?>
-        <div class="wrap"><h1>📊 Statystyki — Article Reader</h1>
+        <div class="wrap"><h1>📊 Yash — Statistics</h1>
         <p>Zakres: <?php foreach([7,30,90] as $d): ?><a href="?page=article-reader-stats&days=<?php echo $d;?>" <?php if($days===$d) echo 'style="font-weight:bold"';?>><?php echo $d;?> dni</a> &nbsp;<?php endforeach;?></p>
         <div class="ar-admin-cards">
             <div class="ar-card"><div class="ar-card__val"><?php echo number_format($stats['plays']);?></div><div class="ar-card__label">Odtworzeń</div></div>
