@@ -305,6 +305,8 @@ class Yash {
 
     public function inject_floating_player() {
         if ( ! is_singular( 'post' ) ) return;
+        $o = get_option( 'article_reader_options', [] );
+        if ( empty( $o['floating_player'] ) ) return;
         ?>
         <div id="ar-floating" role="region" aria-label="Mini odtwarzacz" aria-hidden="true">
             <div class="ar-float-inner">
@@ -314,10 +316,11 @@ class Yash {
                         <?php for($i=0;$i<8;$i++): ?><span class="ar-fbar" style="--i:<?php echo $i;?>"></span><?php endfor; ?>
                     </span>
                     <div class="ar-float-texts">
-                        <span class="ar-float-title">▶ Słuchaj artykułu</span>
+                        <span class="ar-float-title">Słuchaj artykułu</span>
                         <span class="ar-float-status" id="ar-float-status">Naciśnij play</span>
                     </div>
                 </div>
+                <span class="ar-float-time" id="ar-float-time"></span>
                 <div class="ar-float-controls">
                     <button class="ar-btn ar-btn--skip" id="ar-float-skip-back" aria-label="−15s" title="−15 sekund">
                         <svg viewBox="0 0 24 24" fill="currentColor" width="17" height="17"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
@@ -677,6 +680,7 @@ class Yash {
             'pitch'    => min( 20.0, max( -20.0, (float)( $in['pitch'] ?? 0.0 ) ) ),
             'position' => in_array( $in['position'] ?? '', ['before','after'] ) ? $in['position'] : 'before',
             'auto_gen'         => ! empty( $in['auto_gen'] ),
+            'floating_player'  => ! empty( $in['floating_player'] ),
             'claude_key'       => sanitize_text_field( $in['claude_key'] ?? '' ),
             'podcast'          => ! empty( $in['podcast'] ),
             'pause_heading_before' => min( 2000, max( 100, (int)( $in['pause_heading_before'] ?? 900 ) ) ),
@@ -768,6 +772,10 @@ class Yash {
             </tr>
             <tr><th>Auto-generowanie</th><td>
                 <label><input type="checkbox" name="article_reader_options[auto_gen]" value="1" <?php checked(!empty($o['auto_gen']));?>> Generuj audio automatycznie przy publikacji wpisu</label>
+            </td></tr>
+            <tr><th>Floating player</th><td>
+                <label><input type="checkbox" name="article_reader_options[floating_player]" value="1" <?php checked(!empty($o['floating_player']));?>> Pokazuj mini-player na dole ekranu podczas przewijania</label>
+                <p class="description">Domyślnie wyłączony. Włącz jeśli Twój motyw jest z nim kompatybilny.</p>
             </td></tr>
             <tr><th>Podcast RSS</th><td>
                 <label><input type="checkbox" name="article_reader_options[podcast]" value="1" <?php checked(!empty($o['podcast']));?>> Włącz Podcast RSS feed</label>

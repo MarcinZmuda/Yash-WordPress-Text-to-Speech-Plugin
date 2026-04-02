@@ -5,6 +5,72 @@
     function init() {
         const cfg = window.AR || {};
 
+        /* ---- Wykryj kolor akcentu z motywu ---- */
+        function detectThemeAccent() {
+            const checks = [
+                // Kolejność prób: CSS zmienne motywów → kolory elementów → fallback
+                () => getComputedStyle(document.documentElement).getPropertyValue('--et_accent_color').trim(),      // XStore/Elementor
+                () => getComputedStyle(document.documentElement).getPropertyValue('--color-accent').trim(),
+                () => getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim(),
+                () => getComputedStyle(document.documentElement).getPropertyValue('--primary-color').trim(),
+                () => getComputedStyle(document.documentElement).getPropertyValue('--theme-color').trim(),
+                () => getComputedStyle(document.documentElement).getPropertyValue('--wp--preset--color--primary').trim(),
+                () => getComputedStyle(document.documentElement).getPropertyValue('--wp--preset--color--vivid-cyan-blue').trim(),
+                () => {
+                    // Kolor z pierwszego linku / buttona na stronie
+                    const el = document.querySelector('a:not(#article-reader-player a), .button, .btn, button[type="submit"]');
+                    if (!el) return '';
+                    const c = getComputedStyle(el).color;
+                    return c !== 'rgb(0, 0, 0)' && c !== 'rgba(0, 0, 0, 0)' ? c : '';
+                },
+            ];
+
+            for (const fn of checks) {
+                try {
+                    const val = fn();
+                    if (val && val !== '' && val !== 'transparent' && val !== 'rgba(0, 0, 0, 0)') {
+                        return val;
+                    }
+                } catch(e) {}
+            }
+            return '#1a73e8'; // fallback niebieski
+        }
+
+        function rgbFromColor(color) {
+            // Parsuj rgb(r,g,b) lub hex → "r,g,b"
+            const tmp = document.createElement('div');
+            tmp.style.color = color;
+            document.body.appendChild(tmp);
+            const c = getComputedStyle(tmp).color;
+            document.body.removeChild(tmp);
+            const m = c.match(/\d+/g);
+            if (m && m.length >= 3) return m[0] + ',' + m[1] + ',' + m[2];
+            return '26,115,232';
+        }
+
+        function isDarkBg() {
+            // Sprawdź czy tło strony jest ciemne
+            const bg = getComputedStyle(document.body).backgroundColor;
+            const m  = bg.match(/\d+/g);
+            if (!m) return false;
+            const lum = (parseInt(m[0]) * 299 + parseInt(m[1]) * 587 + parseInt(m[2]) * 114) / 1000;
+            return lum < 128;
+        }
+
+        function applyThemeColors() {
+            const accent = detectThemeAccent();
+            const rgb    = rgbFromColor(accent);
+            const root   = document.documentElement;
+            root.style.setProperty('--yash-accent',     accent);
+            root.style.setProperty('--yash-accent-rgb', rgb);
+            // Tło białe, tekst czarny — niezmiennie
+            // Przycisk play = kolor akcentu zamiast czarnego jeśli motyw ma wyrazisty kolor
+            root.style.setProperty('--yash-play-bg', accent);
+            root.style.setProperty('--yash-play-fg', '#ffffff');
+        }
+
+        applyThemeColors();
+
     /* ---- DOM — main player ---- */
     const player      = document.getElementById('article-reader-player');
     const btnPlay     = document.getElementById('ar-play');
@@ -30,6 +96,7 @@
     const floatClose    = document.getElementById('ar-float-close');
     const floatStatus   = document.getElementById('ar-float-status');
     const floatProgress = document.getElementById('ar-float-progress');
+    const floatTime     = document.getElementById('ar-float-time');
     const floatWaveform = floating && floating.querySelector('.ar-float-waveform');
     const floatIconPlay = floatPlay && floatPlay.querySelector('.ar-icon--play');
     const floatIconPause= floatPlay && floatPlay.querySelector('.ar-icon--pause');
@@ -96,6 +163,7 @@
             if (isPlaying) {
                 elapsed++;
                 if (timeEl) timeEl.textContent = fmt(elapsed);
+                if (floatTime) floatTime.textContent = fmt(elapsed);
                 // Aktualizuj też floating progress na podstawie currentAudio.currentTime
                 if (currentAudio && currentAudio.duration && floatProgress) {
                     const chunkPct = currentAudio.currentTime / currentAudio.duration;
