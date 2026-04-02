@@ -84,53 +84,43 @@
 
     /* ---- Podświetlanie ---- */
     function initParagraphs() {
-        // Próbuj znaleźć akapity z atrybutem dodanym przez PHP
         let found = Array.from(document.querySelectorAll('[data-ar-p]'));
+        if (found.length > 0) return found;
 
-        // Fallback: jeśli PHP nie dodało atrybutów (np. cache), dodaj je przez JS
-        if (found.length === 0) {
-            const selectors = [
-                'article .entry-content p',
-                'article .post-content p',
-                '.entry-content p',
-                '.post-content p',
-                '.article-content p',
-                '.content-area p',
-                'main article p',
-                '.single-post p',
-                'article p',
-            ];
+        // Selektory — Elementor na pierwszym miejscu
+        const selectors = [
+            '.elementor-widget-text-editor p',
+            '.elementor-text-editor p',
+            '.elementor-widget-container p',
+            'article .entry-content p',
+            'article .post-content p',
+            '.entry-content p',
+            '.post-content p',
+            '.article-content p',
+            'main article p',
+            'article p',
+        ];
 
-            let container = null;
-            for (const sel of selectors) {
-                const els = document.querySelectorAll(sel);
-                if (els.length > 1) { // min 2 akapity
-                    container = els;
-                    break;
-                }
-            }
-
-            // Ostateczny fallback - wszystkie p na stronie z treścią
-            if (!container) {
-                container = Array.from(document.querySelectorAll('p')).filter(p => {
-                    // Pomiń krótkie, nawigacyjne i elementy playera
-                    return p.textContent.trim().length > 60
-                        && !p.closest('#article-reader-player')
-                        && !p.closest('nav')
-                        && !p.closest('header')
-                        && !p.closest('footer');
-                });
-            }
-
-            // Nadaj atrybuty
-            Array.from(container).forEach((p, i) => {
-                p.setAttribute('data-ar-p', i);
-            });
-
-            found = Array.from(document.querySelectorAll('[data-ar-p]'));
+        let els = [];
+        for (const sel of selectors) {
+            const nodes = document.querySelectorAll(sel);
+            if (nodes.length > 1) { els = Array.from(nodes); break; }
         }
 
-        return found;
+        // Ostateczny fallback
+        if (els.length === 0) {
+            els = Array.from(document.querySelectorAll('p')).filter(p =>
+                p.textContent.trim().length > 60
+                && !p.closest('#article-reader-player')
+                && !p.closest('nav')
+                && !p.closest('header')
+                && !p.closest('footer')
+                && !p.closest('.elementor-widget-button')
+            );
+        }
+
+        els.forEach((p, i) => p.setAttribute('data-ar-p', i));
+        return Array.from(document.querySelectorAll('[data-ar-p]'));
     }
 
     function highlightChunk(idx) {

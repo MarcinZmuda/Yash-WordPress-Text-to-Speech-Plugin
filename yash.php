@@ -48,7 +48,18 @@ class Yash {
     public function enqueue_assets() {
         if ( ! is_singular( 'post' ) ) return;
         wp_enqueue_style(  'article-reader', YASH_URL . 'css/style.css', [], YASH_VERSION );
-        wp_enqueue_script( 'article-reader', YASH_URL . 'js/tts.js',    [], YASH_VERSION, true );
+        wp_enqueue_script( 'article-reader', YASH_URL . 'js/tts.js', [], YASH_VERSION, true );
+
+        // Wyklucz tts.js z opóźnienia LiteSpeed Cache
+        add_filter( 'litespeed_optm_js_defer_exc',   [ $this, 'litespeed_exclude' ] );
+        add_filter( 'litespeed_optimize_js_excludes', [ $this, 'litespeed_exclude' ] );
+        // Wyklucz z WP Rocket JS delay
+        add_filter( 'rocket_delay_js_exclusions', [ $this, 'litespeed_exclude' ] );
+        // Atrybut bezpośrednio w tagu <script>
+        add_filter( 'script_loader_tag', function( $tag, $handle ) {
+            if ( $handle !== 'article-reader' ) return $tag;
+            return str_replace( '<script ', '<script data-no-optimize="1" data-no-defer="1" data-pagespeed-no-defer data-no-delay="1" ', $tag );
+        }, 10, 2 );
         $o = get_option( 'article_reader_options', [] );
         wp_localize_script( 'article-reader', 'AR', [
             'ajaxUrl'   => admin_url( 'admin-ajax.php' ),
@@ -60,6 +71,11 @@ class Yash {
             'hasKey'    => ! empty( $o['api_key'] ),
             'highlight' => (bool)( $o['highlight'] ?? true ),
         ] );
+    }
+
+    public function litespeed_exclude( $list ) {
+        $list[] = 'tts.js';
+        return $list;
     }
 
     public function admin_assets( $hook ) {
