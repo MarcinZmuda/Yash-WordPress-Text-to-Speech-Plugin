@@ -83,8 +83,57 @@
     }
 
     /* ---- Podświetlanie ---- */
+    function initParagraphs() {
+        // Próbuj znaleźć akapity z atrybutem dodanym przez PHP
+        let found = Array.from(document.querySelectorAll('[data-ar-p]'));
+
+        // Fallback: jeśli PHP nie dodało atrybutów (np. cache), dodaj je przez JS
+        if (found.length === 0) {
+            const selectors = [
+                'article .entry-content p',
+                'article .post-content p',
+                '.entry-content p',
+                '.post-content p',
+                '.article-content p',
+                '.content-area p',
+                'main article p',
+                '.single-post p',
+                'article p',
+            ];
+
+            let container = null;
+            for (const sel of selectors) {
+                const els = document.querySelectorAll(sel);
+                if (els.length > 1) { // min 2 akapity
+                    container = els;
+                    break;
+                }
+            }
+
+            // Ostateczny fallback - wszystkie p na stronie z treścią
+            if (!container) {
+                container = Array.from(document.querySelectorAll('p')).filter(p => {
+                    // Pomiń krótkie, nawigacyjne i elementy playera
+                    return p.textContent.trim().length > 60
+                        && !p.closest('#article-reader-player')
+                        && !p.closest('nav')
+                        && !p.closest('header')
+                        && !p.closest('footer');
+                });
+            }
+
+            // Nadaj atrybuty
+            Array.from(container).forEach((p, i) => {
+                p.setAttribute('data-ar-p', i);
+            });
+
+            found = Array.from(document.querySelectorAll('[data-ar-p]'));
+        }
+
+        return found;
+    }
+
     function highlightChunk(idx) {
-        // Zawsze podświetlaj — nie sprawdzaj cfg.highlight (może być undefined)
         if (!paragraphs.length || !chunks.length) return;
 
         paragraphs.forEach(p => p.classList.remove('ar-highlighted'));
@@ -98,7 +147,7 @@
         if (!p) return;
         p.classList.add('ar-highlighted');
 
-        // Przewiń do podświetlonego akapitu jeśli poza widokiem
+        // Przewiń do akapitu jeśli poza widokiem
         const rect = p.getBoundingClientRect();
         if (rect.top < 80 || rect.bottom > window.innerHeight - 80) {
             p.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -234,7 +283,7 @@
         progressTrack.addEventListener('click', e => {
             // Upewnij się że chunki są zbudowane
             if (!chunks.length) chunks = buildChunks();
-            if (!paragraphs.length) paragraphs = Array.from(document.querySelectorAll('[data-ar-p]'));
+            if (!paragraphs.length) paragraphs = initParagraphs();
             const rect = progressTrack.getBoundingClientRect();
             const pct  = Math.max(0, Math.min(1, (e.clientX - rect.left) / rect.width));
             seekTo(pct);
@@ -270,7 +319,7 @@
         if (currentAudio) { currentAudio.pause(); currentAudio = null; }
 
         chunks     = buildChunks();
-        paragraphs = Array.from(document.querySelectorAll('[data-ar-p]'));
+        paragraphs = initParagraphs();
         audioQueue = {};
         currentIdx = 0;
         elapsed    = 0;

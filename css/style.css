@@ -276,14 +276,14 @@
 /* ------------------------------------------------------------------ */
 
 [data-ar-p] {
-    transition: background-color .3s ease, outline-color .35s ease;
-    border-radius: 3px;
+    transition: background-color .3s ease, box-shadow .3s ease;
+    border-radius: 4px;
 }
 
 [data-ar-p].ar-highlighted {
-    background-color: rgba(0, 0, 0, .05) !important;
-    outline: 2px solid rgba(0, 0, 0, .12) !important;
-    outline-offset: 3px;
+    background-color: rgba(0, 100, 200, .07) !important;
+    box-shadow: inset 3px 0 0 rgba(0, 100, 200, .4) !important;
+    padding-left: 8px !important;
 }
 
 /* ------------------------------------------------------------------ */
@@ -302,8 +302,8 @@
     .ar-btn--speed    { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); }
 
     [data-ar-p].ar-highlighted {
-        background-color: rgba(255,255,255,.07) !important;
-        outline-color:    rgba(255,255,255,.15) !important;
+        background-color: rgba(100, 180, 255, .10) !important;
+        box-shadow: inset 3px 0 0 rgba(100, 180, 255, .5) !important;
     }
 }
 
