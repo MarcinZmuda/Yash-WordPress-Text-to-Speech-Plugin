@@ -1,0 +1,321 @@
+/* ====================================================================
+   Article Reader — Player
+   ==================================================================== */
+
+#article-reader-player {
+    margin: 0 0 2em 0;
+    border-radius: 10px;
+    background: transparent;
+    border: 1px solid rgba(0,0,0,.10);
+    box-shadow: 0 1px 6px rgba(0,0,0,.06);
+    font-family: inherit;
+    font-size: 13px;
+    line-height: 1.4;
+    color: inherit;
+    transition: box-shadow .2s;
+}
+
+#article-reader-player:hover {
+    box-shadow: 0 2px 12px rgba(0,0,0,.10);
+}
+
+/* ------------------------------------------------------------------ */
+/*  Layout                                                              */
+/* ------------------------------------------------------------------ */
+
+.ar-inner {
+    padding: 14px 16px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Waveform                                                            */
+/* ------------------------------------------------------------------ */
+
+.ar-waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+.ar-bar {
+    display: block;
+    width: 2px;
+    border-radius: 2px;
+    background: rgba(0,0,0,.15);
+    height: 6px;
+    transition: background .3s;
+}
+
+.ar-waveform:not(.ar-waveform--active) .ar-bar {
+    height: calc(3px + (var(--i) % 4) * 3px);
+}
+
+.ar-waveform--active .ar-bar {
+    background: currentColor;
+    opacity: .6;
+    animation: ar-wave 1s ease-in-out infinite;
+    animation-delay: calc(var(--i) * 0.05s);
+}
+
+@keyframes ar-wave {
+    0%, 100% { height: 3px; opacity: .35; }
+    50%       { height: calc(4px + (var(--i) % 5 + 1) * 4px); opacity: .7; }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Środek                                                              */
+/* ------------------------------------------------------------------ */
+
+.ar-middle {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.ar-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.ar-label {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .07em;
+    text-transform: uppercase;
+    opacity: .55;
+}
+
+.ar-badge {
+    font-size: 10px;
+    opacity: .4;
+    background: rgba(0,0,0,.05);
+    border: 1px solid rgba(0,0,0,.08);
+    border-radius: 3px;
+    padding: 1px 5px;
+}
+
+.ar-read-time {
+    font-size: 11px;
+    opacity: .4;
+}
+
+.ar-time {
+    margin-left: auto;
+    font-size: 11px;
+    font-family: monospace;
+    opacity: .45;
+    letter-spacing: .03em;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Pasek postępu z możliwością przewijania                            */
+/* ------------------------------------------------------------------ */
+
+.ar-progress-wrap {
+    position: relative;
+    padding: 8px 0;           /* duży obszar klikalny */
+    cursor: pointer;
+    margin: -2px 0;
+}
+
+.ar-progress-track {
+    height: 4px;
+    background: rgba(0,0,0,.10);
+    border-radius: 3px;
+    overflow: visible;
+    position: relative;
+    transition: height .15s;
+}
+
+.ar-progress-wrap:hover .ar-progress-track {
+    height: 6px;
+}
+
+.ar-progress-fill {
+    height: 100%;
+    width: 0%;
+    background: currentColor;
+    opacity: .5;
+    border-radius: 3px;
+    transition: width .5s ease;
+    position: relative;
+}
+
+/* Uchwyt (kółko) na końcu paska */
+.ar-progress-fill::after {
+    content: '';
+    position: absolute;
+    right: -5px;
+    top: 50%;
+    transform: translateY(-50%) scale(0);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .8;
+    transition: transform .15s;
+}
+
+.ar-progress-wrap:hover .ar-progress-fill::after {
+    transform: translateY(-50%) scale(1);
+}
+
+/* Status */
+.ar-status {
+    font-size: 11px;
+    opacity: .45;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    transition: opacity .3s;
+}
+
+#article-reader-player.ar-is-playing .ar-status {
+    opacity: .65;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Kontrolki                                                           */
+/* ------------------------------------------------------------------ */
+
+.ar-controls {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.ar-btn {
+    cursor: pointer;
+    border: none;
+    background: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity .15s, transform .15s;
+    padding: 0;
+    line-height: 1;
+    color: inherit;
+}
+
+.ar-btn--main {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: .75;
+    box-shadow: 0 1px 5px rgba(0,0,0,.15);
+    position: relative;
+    flex-shrink: 0;
+}
+
+.ar-btn--main svg {
+    width: 16px;
+    height: 16px;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    fill: #fff;
+    color: #fff;
+}
+
+.ar-btn--main:hover { opacity: .9; transform: scale(1.06); }
+.ar-btn--main:active { transform: scale(.96); }
+
+.ar-btn--stop {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0,0,0,.06);
+    border: 1px solid rgba(0,0,0,.10);
+    opacity: .65;
+}
+
+.ar-btn--stop svg {
+    width: 9px;
+    height: 9px;
+    fill: currentColor;
+}
+
+.ar-btn--stop:hover { opacity: 1; background: rgba(0,0,0,.10); }
+
+.ar-btn--speed {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: inherit;
+    color: inherit;
+    background: rgba(0,0,0,.05);
+    border: 1px solid rgba(0,0,0,.10);
+    border-radius: 4px;
+    padding: 3px 7px;
+    min-width: 30px;
+    text-align: center;
+    cursor: pointer;
+    opacity: .6;
+    transition: opacity .15s;
+}
+
+.ar-btn--speed:hover { opacity: 1; }
+
+.ar-spin { animation: ar-spinner .7s linear infinite; }
+@keyframes ar-spinner { to { transform: rotate(360deg); } }
+
+/* ------------------------------------------------------------------ */
+/*  Podświetlanie akapitu                                               */
+/* ------------------------------------------------------------------ */
+
+[data-ar-p] {
+    transition: background-color .3s ease, outline-color .35s ease;
+    border-radius: 3px;
+}
+
+[data-ar-p].ar-highlighted {
+    background-color: rgba(0, 0, 0, .05) !important;
+    outline: 2px solid rgba(0, 0, 0, .12) !important;
+    outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Tryb ciemny                                                         */
+/* ------------------------------------------------------------------ */
+
+@media (prefers-color-scheme: dark) {
+    #article-reader-player {
+        border-color: rgba(255,255,255,.12);
+        box-shadow: 0 1px 6px rgba(0,0,0,.3);
+    }
+    .ar-bar           { background: rgba(255,255,255,.20); }
+    .ar-progress-track{ background: rgba(255,255,255,.12); }
+    .ar-badge         { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.10); }
+    .ar-btn--stop     { background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); }
+    .ar-btn--speed    { background: rgba(255,255,255,.07); border-color: rgba(255,255,255,.12); }
+
+    [data-ar-p].ar-highlighted {
+        background-color: rgba(255,255,255,.07) !important;
+        outline-color:    rgba(255,255,255,.15) !important;
+    }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Responsywność                                                       */
+/* ------------------------------------------------------------------ */
+
+@media (max-width: 480px) {
+    .ar-inner      { gap: 10px; padding: 12px 14px; }
+    .ar-waveform   { height: 24px; }
+    .ar-badge,
+    .ar-read-time  { display: none; }
+    .ar-btn--main  { width: 36px; height: 36px; }
+    .ar-btn--main svg { width: 14px; height: 14px; }
+}

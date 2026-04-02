@@ -1,0 +1,57 @@
+.ar-admin-cards {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin: 20px 0 28px;
+}
+.ar-card {
+    background: #fff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 18px 24px;
+    min-width: 130px;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+}
+.ar-card__val {
+    font-size: 28px;
+    font-weight: 700;
+    color: #e07b39;
+    line-height: 1;
+    margin-bottom: 4px;
+}
+.ar-card__label {
+    font-size: 12px;
+    color: #666;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+}
+
+/* Bar chart */
+.ar-chart-wrap {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 100px;
+    padding: 12px 0 8px;
+    overflow-x: auto;
+}
+.ar-chart-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 20px;
+    cursor: default;
+}
+.ar-chart-fill {
+    width: 16px;
+    background: #e07b39;
+    border-radius: 3px 3px 0 0;
+    min-height: 3px;
+    transition: opacity .2s;
+}
+.ar-chart-bar:hover .ar-chart-fill { opacity: .75; }
+.ar-chart-val {
+    font-size: 10px;
+    color: #999;
+}
